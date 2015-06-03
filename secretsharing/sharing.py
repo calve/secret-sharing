@@ -138,6 +138,12 @@ class SecretSharer():
         return shares, g, p, parts, commitments
 
     @classmethod
+    def verify(cls, share_string, part, g, p):
+        x_string, y_string = share_string.split('-')
+        y = charset_to_int(y_string, cls.share_charset)
+        return part == pow(g, y, p)
+
+    @classmethod
     def recover_secret(cls, shares):
         points = []
         for share in shares:
