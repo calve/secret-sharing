@@ -14,13 +14,17 @@ from utilitybelt import int_to_charset, charset_to_int, base58_chars, \
 from .primes import get_large_enough_prime
 from .polynomials import random_polynomial, \
     get_polynomial_points, modular_lagrange_interpolation
+import random
 
 
-def secret_int_to_points(secret_int, point_threshold, num_points):
+def secret_int_to_points(secret_int, point_threshold, num_points, verifiable=False):
     """ Split a secret (integer) into shares (pair of integers / x,y coords).
 
         Sample the points of a random polynomial with the y intercept equal to
         the secret int.
+
+        If verifiable is set to True, this function will return a tuple of the form
+        (points, g, p, parts, commitments)
     """
     if point_threshold < 2:
         raise ValueError("Threshold must be >= 2.")
@@ -31,7 +35,19 @@ def secret_int_to_points(secret_int, point_threshold, num_points):
         raise ValueError("Error! Secret is too long for share calculation!")
     coefficients = random_polynomial(point_threshold-1, secret_int, prime)
     points = get_polynomial_points(coefficients, num_points, prime)
-    return points
+    if verifiable:
+        g = random.randrange(1, prime-1)
+        commitments = []
+        parts = []
+        for c in coefficients:
+            r = pow(g, c, prime)
+            commitments.append(r)
+        for _, y in points:
+            r = pow(g, y, prime)
+            parts.append(r)
+        return points, g, prime, parts, commitments
+    else:
+        return points
 
 
 def points_to_secret_int(points):
@@ -111,6 +127,15 @@ class SecretSharer():
         for point in points:
             shares.append(point_to_share_string(point, cls.share_charset))
         return shares
+
+    @classmethod
+    def split_verifiable_secret(cls, secret_string, share_threshold, num_shares):
+        secret_int = charset_to_int(secret_string, cls.secret_charset)
+        points, g, p, parts, commitments = secret_int_to_points(secret_int, share_threshold, num_shares, verifiable=True)
+        shares = []
+        for point in points:
+            shares.append(point_to_share_string(point, cls.share_charset))
+        return shares, g, p, parts, commitments
 
     @classmethod
     def recover_secret(cls, shares):
