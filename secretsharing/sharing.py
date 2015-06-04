@@ -24,7 +24,7 @@ def secret_int_to_points(secret_int, point_threshold, num_points, verifiable=Fal
         the secret int.
 
         If verifiable is set to True, this function will return a tuple of the form
-        (points, g, p, parts, commitments)
+        (points, g, p, commitments) where g, p and commitments can be publically shared
     """
     if point_threshold < 2:
         raise ValueError("Threshold must be >= 2.")
