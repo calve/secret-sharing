@@ -38,14 +38,10 @@ def secret_int_to_points(secret_int, point_threshold, num_points, verifiable=Fal
     if verifiable:
         g = random.randrange(1, prime-1)
         commitments = []
-        parts = []
-        for c in coefficients:
-            r = pow(g, c, prime)
-            commitments.append(r)
         for x, y in points:
             r = pow(g, y, prime)
-            parts.append((x, r))
-        return points, g, prime, parts, commitments
+            commitments.append((x, r))
+        return points, g, prime, commitments
     else:
         return points
 
@@ -131,34 +127,32 @@ class SecretSharer():
     @classmethod
     def split_verifiable_secret(cls, secret_string, share_threshold, num_shares):
         secret_int = charset_to_int(secret_string, cls.secret_charset)
-        points, g, p, parts, commitments = secret_int_to_points(secret_int, share_threshold, num_shares, verifiable=True)
+        points, g, p, commitments = secret_int_to_points(secret_int, share_threshold, num_shares, verifiable=True)
         shares = []
-        final_parts = []
         final_commitments = []
         for point in points:
             shares.append(point_to_share_string(point, cls.share_charset))
-        for part in parts:
-            final_parts.append(point_to_share_string(part, cls.secret_charset))
         for commitment in commitments:
-            final_commitments.append(int_to_charset(commitment, cls.secret_charset))
+            final_commitments.append(point_to_share_string(commitment, cls.secret_charset))
         final_g = int_to_charset(g, cls.share_charset)
         final_p = int_to_charset(p, cls.share_charset)
-        return shares, final_g, final_p, final_parts, final_commitments
+        return shares, final_g, final_p, final_commitments
 
     @classmethod
-    def verify(cls, share_string, parts, g_string, p_string):
+    def verify(cls, share_string, commitments, g_string, p_string):
         g = charset_to_int(g_string, cls.share_charset)
         p = charset_to_int(p_string, cls.share_charset)
         x_string, y_string = share_string.split('-')
-        for part in parts:
-            x_part, y_part = part.split('-')
-            if x_part == x_string:
-                f = charset_to_int(y_part, cls.share_charset)
+        for commitment in commitments:
+            x_commitment, y_commitment = commitment.split('-')
+            if x_commitment == x_string:
+                f = charset_to_int(y_commitment, cls.share_charset)
                 break
         else:
             raise ValueError("Cannot find the part to verify this share")
         y = charset_to_int(y_string, cls.share_charset)
         return f == pow(g, y, p)
+
 
     @classmethod
     def recover_secret(cls, shares):
