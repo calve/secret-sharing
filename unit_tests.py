@@ -32,23 +32,37 @@ class ShamirSharingTest(unittest.TestCase):
         assert(recovered_secret == secret)
 
     def split_verify_and_recover_secret(self, sharer_class, m, n, secret):
-        shares, g, p, parts, commitments = sharer_class.split_verifiable_secret(secret, m, n)
+        shares, g, p, commitments = sharer_class.split_verifiable_secret(secret, m, n)
         random.shuffle(shares)
         recovered_secret = sharer_class.recover_secret(shares[0:m])
         assert(recovered_secret == secret)
         for share in shares:
-            assert(SecretSharer.verify(share, parts, g, p) == True)
+            assert(SecretSharer.verify(share, commitments, g, p) == True)
 
     def split_and_verify_corrupted_secret(self, sharer_class, m, n, secret):
-        shares, g, p, parts, commitments = sharer_class.split_verifiable_secret(secret, m, n)
+        shares, g, p, commitments = sharer_class.split_verifiable_secret(secret, m, n)
         random.shuffle(shares)
         r = random.randint(0, len(shares) - 1)
-        shares[r] = shares[r].replace('a', 'b') # mess with one shared secret
+        shares[r] = shares[r].replace('a', 'b')  # mess with one shared secret
         for i in range(len(shares)):
             if i == r:
-                assert(SecretSharer.verify(shares[i], parts, g, p) == False)
+                assert(SecretSharer.verify(shares[i], commitments, g, p) == False)
             else:
-                assert(SecretSharer.verify(shares[i], parts, g, p) == True)
+                assert(SecretSharer.verify(shares[i], commitments, g, p) == True)
+
+    def n_of_m_sharing(self, n, m):
+        """
+        Test to split a secret in m parts, then verify them, then corrupt one and verify
+        """
+        recovered_secret = self.split_and_recover_secret(
+            SecretSharer, n, m,
+            "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
+        recovered_secret = self.split_verify_and_recover_secret(
+            SecretSharer, n, m,
+            "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
+        recovered_secret = self.split_and_verify_corrupted_secret(
+            SecretSharer, n, m,
+            "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
 
     def test_hex_to_hex_sharing(self):
         recovered_secret = self.split_and_recover_secret(
@@ -83,48 +97,16 @@ class ShamirSharingTest(unittest.TestCase):
             "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
 
     def test_2_of_3_sharing(self):
-        recovered_secret = self.split_and_recover_secret(
-            SecretSharer, 2, 3,
-            "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
-        recovered_secret = self.split_verify_and_recover_secret(
-            SecretSharer, 2, 3,
-            "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
-        recovered_secret = self.split_and_verify_corrupted_secret(
-            SecretSharer, 2, 3,
-            "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
+        self.n_of_m_sharing(2, 3)
 
     def test_4_of_7_sharing(self):
-        recovered_secret = self.split_and_recover_secret(
-            SecretSharer, 4, 7,
-            "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
-        recovered_secret = self.split_verify_and_recover_secret(
-            SecretSharer, 4, 7,
-            "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
-        recovered_secret = self.split_and_verify_corrupted_secret(
-            SecretSharer, 4, 7,
-            "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
+        self.n_of_m_sharing(4, 7)
 
     def test_5_of_9_sharing(self):
-        recovered_secret = self.split_and_recover_secret(
-            SecretSharer, 5, 9,
-            "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
-        recovered_secret = self.split_verify_and_recover_secret(
-            SecretSharer, 5, 9,
-            "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
-        recovered_secret = self.split_and_verify_corrupted_secret(
-            SecretSharer, 5, 9,
-            "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
+        self.n_of_m_sharing(5, 9)
 
     def test_2_of_2_sharing(self):
-        recovered_secret = self.split_and_recover_secret(
-            SecretSharer, 2, 2,
-            "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
-        recovered_secret = self.split_verify_and_recover_secret(
-            SecretSharer, 2, 2,
-            "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
-        recovered_secret = self.split_and_verify_corrupted_secret(
-            SecretSharer, 2, 2,
-            "c4bbcb1fbec99d65bf59d85c8cb62ee2db963f0fe106f483d9afa73bd4e39a8a")
+        self.n_of_m_sharing(2, 2)
 
 
 def test_main():
