@@ -5,10 +5,11 @@ Secret Sharing
 """
 
 from setuptools import setup
+from secretsharing import __version__
 
 setup(
     name='secretsharing',
-    version='0.2.6',
+    version=__version__,
     url='https://github.com/onenameio/secret-sharing',
     license='MIT',
     author='Halfmoon Labs',
