@@ -1,16 +1,13 @@
 SecretSharing
 =============
 
-[![Travis](https://img.shields.io/travis/onenameio/secret-sharing.svg)](https://travis-ci.org/onenameio/secret-sharing)
-[![PyPI](https://img.shields.io/pypi/v/secretsharing.svg)](https://pypi.python.org/pypi/secretsharing/)
-[![PyPI](https://img.shields.io/pypi/dm/secretsharing.svg)](https://pypi.python.org/pypi/secretsharing/)
-[![PyPI](https://img.shields.io/pypi/l/secretsharing.svg)](https://github.com/onenameio/secret-sharing/blob/master/LICENSE)
-
 Tools for sharing secrets (like Bitcoin private keys), using shamir's secret sharing scheme.
+
+This is a Python3 fork of https://github.com/onenameio/secret-sharing/
 
 ## Installation
 
-    >>> pip install secretsharing
+    >>> pip3 install secretsharing
 
 ## Sample Usage
 

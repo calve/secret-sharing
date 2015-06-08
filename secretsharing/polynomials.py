@@ -7,7 +7,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from utilitybelt import secure_randint as randint
+from utilitybelt3 import secure_randint as randint
 
 
 def egcd(a, b):
@@ -49,7 +49,7 @@ def get_polynomial_points(coefficients, num_points, prime):
         y = coefficients[0]
         # calculate each term and add it to y, using modular math
         for i in range(1, len(coefficients)):
-            exponentiation = (long(x)**i) % prime
+            exponentiation = (int(x)**i) % prime
             term = (coefficients[i] * exponentiation) % prime
             y = (y + term) % prime
         # add the point to the list of points
@@ -59,9 +59,9 @@ def get_polynomial_points(coefficients, num_points, prime):
 
 def modular_lagrange_interpolation(x, points, prime):
     # break the points up into lists of x and y values
-    x_values, y_values = zip(*points)
+    x_values, y_values = list(zip(*points))
     # initialize f(x) and begin the calculation: f(x) = SUM( y_i * l_i(x) )
-    f_x = long(0)
+    f_x = int(0)
     for i in range(len(points)):
         # evaluate the lagrange basis polynomial l_i(x)
         numerator, denominator = 1, 1

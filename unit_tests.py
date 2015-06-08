@@ -9,8 +9,8 @@
 
 import random
 import unittest
-from test import test_support
-from utilitybelt import base64_chars
+from test import support
+from utilitybelt3 import base64_chars
 from secretsharing import secret_int_to_points, points_to_secret_int, \
     point_to_share_string, share_string_to_point, SecretSharer, \
     HexToHexSecretSharer, PlaintextToHexSecretSharer, \
@@ -111,7 +111,7 @@ class ShamirSharingTest(unittest.TestCase):
 
 def test_main():
 
-    test_support.run_unittest(
+    support.run_unittest(
         ShamirSharingTest,
     )
 
