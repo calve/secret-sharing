@@ -24,7 +24,10 @@ def secret_int_to_points(secret_int, point_threshold, num_points, verifiable=Fal
         the secret int.
 
         If verifiable is set to True, this function will return a tuple of the form
-        (points, g, p, commitments) where g, p and commitments can be publically shared
+        (points, g, p, commitments) where g, p and commitments can be publically shared.
+        It implement's the Feldman's scheme :
+        We pick a random generator g, and for each share (x, y), we compute the
+        (non reversible) modular exponentiation ``g^y mod p``.
     """
     if point_threshold < 2:
         raise ValueError("Threshold must be >= 2.")
