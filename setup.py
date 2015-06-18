@@ -21,6 +21,7 @@ setup(
     ],
     zip_safe=False,
     install_requires=[
+        'utilitybelt3'
     ],
     classifiers=[
         'Intended Audience :: Developers',
