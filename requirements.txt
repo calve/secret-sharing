@@ -1,2 +1,2 @@
-utilitybelt3>=0.3.6
+-e git+git@bitbucket.org:payplug/utilitybelt3.git#egg=utilitybelt3
 wheel==0.24.0
